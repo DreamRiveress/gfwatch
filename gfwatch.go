@@ -31,6 +31,10 @@ func New() *GfWatch {
 }
 
 func (gfw *GfWatch) IsForbidden(domain string) bool {
+	length := len(domain)
+	if domain[length-1] == '.' {
+		domain = domain[:length-1]
+	}
 	_, found := gfw.gfMap[domain]
 	if !found {
 		return false
