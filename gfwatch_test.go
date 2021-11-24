@@ -15,7 +15,43 @@ func TestJudge(t *testing.T) {
 		t.Error("judge false")
 	}
 
-	if !gfw.IsForbidden("www.google.com") {
+	if !gfw.IsForbidden("www.google.com.yyytest") {
+		t.Error("judge true")
+	}
+
+	if !gfw.IsForbidden("yyytest.lvv2.com") {
+		t.Error("judge true")
+	}
+
+	if !gfw.IsForbidden("yyytestlvv2.com") {
+		t.Error("judge true")
+	}
+
+	if !gfw.IsForbidden("yyytest.podzone.net") {
+		t.Error("judge true")
+	}
+
+	if !gfw.IsForbidden("yyytestpodzone.net") {
+		t.Error("judge true")
+	}
+
+	if !gfw.IsForbidden("podzone.net.yyytest") {
+		t.Error("judge true")
+	}
+
+	if !gfw.IsForbidden("podzone.netyyytest") {
+		t.Error("judge true")
+	}
+
+	if gfw.IsForbidden("yyytest.podzone.net.yyytest") {
+		t.Error("judge false")
+	}
+
+	if gfw.IsForbidden("odzone.net") {
+		t.Error("judge false")
+	}
+
+	if !gfw.IsForbidden("e12.whatsapp.net") {
 		t.Error("judge true")
 	}
 }
@@ -30,7 +66,7 @@ func BenchmarkJudgeFalse(b *testing.B) {
 func BenchmarkJudgeTrue(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		gfw.IsForbidden("www.google.com")
+		gfw.IsForbidden("www.google.com.yyytest")
 	}
 }
 

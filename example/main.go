@@ -20,4 +20,6 @@ func main() {
 		println("err: ", err)
 	}
 	println(gfw.IsForbidden("www.baidu.com"))
+
+	time.Sleep(time.Hour)
 }

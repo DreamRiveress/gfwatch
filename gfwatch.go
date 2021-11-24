@@ -1,11 +1,12 @@
 package gfwatch
 
 import (
+	"strings"
+
+	"github.com/DreamRiveress/gfwatch/trie"
 )
 
-/*
 type DomainType byte
-type gfWatchMap map[string]struct{}
 
 const (
 	DomainCensoredAs DomainType = 0  // Rule 0 - domain censored as is
@@ -18,15 +19,19 @@ const (
 	SBaseDomainDS    DomainType = 7  // Rule 7 - blocked by regex: *base_censored_domain.*
 	SBaseDomainS     DomainType = 8  // Rule 8 - blocked by regex: *base_censored_domain*
 	DomainTypeMax               = 9
-)*/
+)
 
 type GfWatch struct {
-	gfMap map[string]struct{}
+	gfMap      map[string]struct{}
+	suffixTrie *trie.Trie
+	prefixTrie *trie.Trie
 }
 
 func New() *GfWatch {
 	return &GfWatch{
-		gfMap: make(map[string]struct{}),
+		gfMap:      make(map[string]struct{}),
+		suffixTrie: trie.NewTrie(),
+		prefixTrie: trie.NewTrie(),
 	}
 }
 
@@ -36,8 +41,17 @@ func (gfw *GfWatch) IsForbidden(domain string) bool {
 		domain = domain[:length-1]
 	}
 	_, found := gfw.gfMap[domain]
-	if !found {
-		return false
+	if found {
+		return true
 	}
-	return true
+	_, found = gfw.suffixTrie.Get(strings.Split(domain, ""))
+	if found {
+		return true
+	}
+	reverse := reverseHost(domain)
+	_, found = gfw.prefixTrie.Get(strings.Split(reverse, ""))
+	if found {
+		return true
+	}
+	return false
 }
