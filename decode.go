@@ -33,8 +33,12 @@ func (gfw *GfWatch) Decode(r io.Reader) error {
 		reverse         string
 		i               int
 		typ             int
+		ok              bool
+		mark            bool
 		err             error
 	)
+
+	markMap := make(map[string]bool)
 
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
@@ -44,42 +48,50 @@ func (gfw *GfWatch) Decode(r io.Reader) error {
 			continue
 		}
 
-		domainType = lineArray[1][1:len(lineArray[1])-1]
-		domainTypeArray = strings.Split(domainType, ", ")
-		flag = make([]bool, DomainTypeMax)
-		for i = 0; i < len(domainTypeArray); i++ {
-			typ, err = strconv.Atoi(domainTypeArray[i])
-			if err != nil {
-				continue
+		if mark, ok = markMap[lineArray[2]]; !ok {
+			domainType = lineArray[1][1:len(lineArray[1])-1]
+			domainTypeArray = strings.Split(domainType, ", ")
+			flag = make([]bool, DomainTypeMax)
+			for i = 0; i < len(domainTypeArray); i++ {
+				typ, err = strconv.Atoi(domainTypeArray[i])
+				if err != nil {
+					continue
+				}
+				if typ >= DomainTypeMax || typ < 0 {
+					continue
+				}
+				flag[typ] = true
 			}
-			if typ >= DomainTypeMax || typ < 0 {
-				continue
+
+			flagBase = false
+			if flag[BaseDomainS] {
+				gfw.suffixTrie.Set(strings.Split(lineArray[2]+"*", ""), struct{}{})
+				flagBase = true
+			} else if flag[BaseDomainDS] {
+				gfw.suffixTrie.Set(strings.Split(lineArray[2]+".*", ""), struct{}{})
+				flagBase = true
 			}
-			flag[typ] = true
-		}
 
-		flagBase = false
-		if flag[BaseDomainS] {
-			gfw.suffixTrie.Set(strings.Split(lineArray[2]+"*", ""), struct{}{})
-			flagBase = true
-		} else if flag[BaseDomainDS] {
-			gfw.suffixTrie.Set(strings.Split(lineArray[2]+".*", ""), struct{}{})
-			flagBase = true
-		}
-
-		if flag[SBaseDomain] {
-			reverse = reverseHost(lineArray[2])
-			gfw.prefixTrie.Set(strings.Split(reverse+"*", ""), struct{}{})
-			flagBase = true
-		} else if flag[SDBaseDomain] {
-			reverse = reverseHost(lineArray[2])
-			gfw.prefixTrie.Set(strings.Split(reverse+".*", ""), struct{}{})
-			flagBase = true
-		}
-		if flagBase {
-			gfw.gfMap[lineArray[2]] = struct{}{}
+			if flag[SBaseDomain] {
+				reverse = reverseHost(lineArray[2])
+				gfw.prefixTrie.Set(strings.Split(reverse+"*", ""), struct{}{})
+				flagBase = true
+			} else if flag[SDBaseDomain] {
+				reverse = reverseHost(lineArray[2])
+				gfw.prefixTrie.Set(strings.Split(reverse+".*", ""), struct{}{})
+				flagBase = true
+			}
+			if flagBase {
+				gfw.gfMap[lineArray[2]] = struct{}{}
+				markMap[lineArray[2]] = true
+			} else {
+				gfw.gfMap[lineArray[0]] = struct{}{}
+				markMap[lineArray[2]] = false
+			}
 		} else {
-			gfw.gfMap[lineArray[0]] = struct{}{}
+			if !mark {
+				gfw.gfMap[lineArray[0]] = struct{}{}
+			}
 		}
 	}
 

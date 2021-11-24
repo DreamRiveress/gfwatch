@@ -70,6 +70,23 @@ func BenchmarkJudgeTrue(b *testing.B) {
 	}
 }
 
+func BenchmarkDecode(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, err := os.Open("example/domain.rules")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+
+		gfw = New()
+
+		if err := gfw.Decode(f); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func init() {
 	f, err := os.Open("example/domain.rules")
 	if err != nil {
