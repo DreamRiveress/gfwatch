@@ -23,23 +23,11 @@ func TestJudge(t *testing.T) {
 		t.Error("judge true")
 	}
 
-	if !gfw.IsForbidden("yyytestlvv2.com") {
-		t.Error("judge true")
-	}
-
 	if !gfw.IsForbidden("yyytest.podzone.net") {
 		t.Error("judge true")
 	}
 
-	if !gfw.IsForbidden("yyytestpodzone.net") {
-		t.Error("judge true")
-	}
-
 	if !gfw.IsForbidden("podzone.net.yyytest") {
-		t.Error("judge true")
-	}
-
-	if !gfw.IsForbidden("podzone.netyyytest") {
 		t.Error("judge true")
 	}
 
@@ -53,6 +41,22 @@ func TestJudge(t *testing.T) {
 
 	if !gfw.IsForbidden("e12.whatsapp.net") {
 		t.Error("judge true")
+	}
+
+	if !gfw.IsForbidden("www.google.com--news-i80u-cc.org") {
+		t.Error("judge true")
+	}
+
+	if gfw.IsForbidden("www.google.com--news-i80u-cc.org1") {
+		t.Error("judge false")
+	}
+
+	if !gfw.IsForbidden("yyytest.y70b.com") {
+		t.Error("judge true")
+	}
+
+	if gfw.IsForbidden("yyytesty70b.com") {
+		t.Error("judge false")
 	}
 }
 

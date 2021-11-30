@@ -44,12 +44,12 @@ func (gfw *GfWatch) IsForbidden(domain string) bool {
 	if found {
 		return true
 	}
-	_, found = gfw.suffixTrie.Get(strings.Split(domain, ""))
+	_, found = gfw.suffixTrie.Get(strings.Split(domain, "."))
 	if found {
 		return true
 	}
 	reverse := reverseHost(domain)
-	_, found = gfw.prefixTrie.Get(strings.Split(reverse, ""))
+	_, found = gfw.prefixTrie.Get(strings.Split(reverse, "."))
 	if found {
 		return true
 	}
