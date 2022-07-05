@@ -37,6 +37,9 @@ func New() *GfWatch {
 
 func (gfw *GfWatch) IsForbidden(domain string) bool {
 	length := len(domain)
+	if length == 0 {
+		return false
+	}
 	if domain[length-1] == '.' {
 		domain = domain[:length-1]
 	}
